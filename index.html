@@ -5,6 +5,7 @@
   </head>
   <body>
     <button onclick="openCamera()">Open Camera</button>
+    <div id="cameraFeed"></div>
     <div id="recognizedText"></div>
 
     <script>
@@ -15,6 +16,7 @@
             const video = document.createElement("video");
             video.srcObject = stream;
             video.onloadedmetadata = () => {
+              document.getElementById("cameraFeed").appendChild(video);
               video.play();
               setTimeout(() => {
                 const canvas = document.createElement("canvas");
