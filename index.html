@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@v3.0.10"></script>
+  </head>
+  <body>
+    <button onclick="openCamera()">Open Camera</button>
+    <div id="recognizedText"></div>
+
+    <script>
+      const openCamera = () => {
+        navigator.mediaDevices
+          .getUserMedia({ video: true })
+          .then(stream => {
+            const video = document.createElement("video");
+            video.srcObject = stream;
+            video.onloadedmetadata = () => {
+              video.play();
+              setTimeout(() => {
+                const canvas = document.createElement("canvas");
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                canvas.getContext("2d").drawImage(video, 0, 0);
+                Tesseract.recognize(canvas)
+                  .then(function(result) {
+                    const recognizedText = result.text;
+                    document.getElementById("recognizedText").innerHTML = recognizedText;
+                  });
+                stream.getTracks().forEach(track => track.stop());
+              }, 1000);
+            };
+          });
+      };
+    </script>
+  </body>
+</html>
