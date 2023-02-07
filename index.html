@@ -1,41 +1,41 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@v3.0.10"></script>
-  </head>
-  <body>
-    <button onclick="openCamera()">Open Camera</button>
-    <div id="cameraFeed"></div>
-    <div id="recognizedText"></div>
+<div id="output"></div>
+<button id="openCamera">Apri la fotocamera</button>
 
-    <script>
-      const openCamera = () => {
-        const constraints = {
-          video: { facingMode: { exact: "environment" } }
-        };
-        navigator.mediaDevices
-          .getUserMedia(constraints)
-          .then(stream => {
-            const video = document.createElement("video");
-            video.srcObject = stream;
-            video.onloadedmetadata = () => {
-              document.getElementById("cameraFeed").appendChild(video);
-              video.play();
-              setTimeout(() => {
-                const canvas = document.createElement("canvas");
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                canvas.getContext("2d").drawImage(video, 0, 0);
-                Tesseract.recognize(canvas)
-                  .then(function(result) {
-                    const recognizedText = result.text;
-                    document.getElementById("recognizedText").innerHTML = recognizedText;
-                  });
-                stream.getTracks().forEach(track => track.stop());
-              }, 1000);
-            };
-          });
-      };
-    </script>
-  </body>
-</html>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@v2.1.0/dist/tesseract.min.js"></script>
+<script>
+  const openCameraButton = document.getElementById("openCamera");
+  const video = document.createElement("video");
+  const canvas = document.createElement("canvas");
+  const outputDiv = document.getElementById("output");
+
+  let constraints = {
+    video: {
+      facingMode: "environment"
+    }
+  };
+
+  openCameraButton.addEventListener("click", function() {
+    navigator.mediaDevices
+      .getUserMedia(constraints)
+      .then(function(stream) {
+        video.srcObject = stream;
+        video.addEventListener("loadedmetadata", function() {
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+          canvas.getContext("2d").drawImage(video, 0, 0);
+
+          Tesseract.recognize(canvas)
+            .then(function(result) {
+              let text = result.text;
+              outputDiv.innerHTML = text;
+            })
+            .catch(function(err) {
+              console.error(err);
+            });
+        });
+      })
+      .catch(function(err) {
+        console.error(err);
+      });
+  });
+</script>
