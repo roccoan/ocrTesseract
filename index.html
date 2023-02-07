@@ -10,8 +10,11 @@
 
     <script>
       const openCamera = () => {
+        const constraints = {
+          video: { facingMode: { exact: "environment" } }
+        };
         navigator.mediaDevices
-          .getUserMedia({ video: true })
+          .getUserMedia(constraints)
           .then(stream => {
             const video = document.createElement("video");
             video.srcObject = stream;
