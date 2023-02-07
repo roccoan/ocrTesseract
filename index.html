@@ -1,49 +1,20 @@
-<div id="output"></div>
-<video id="video"></video>
-<button id="openCamera">Apri la fotocamera</button>
-<button id="takePicture" style="display:none;">Scatta una foto</button>
+<html>
+  <head>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@v2.2.0/dist/tesseract.min.js"></script>
+  </head>
+  <body>
+    <input type="file" id="input-image"/>
+    <div id="output"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@v2.1.0/dist/tesseract.min.js"></script>
-<script>
-  const openCameraButton = document.getElementById("openCamera");
-  const takePictureButton = document.getElementById("takePicture");
-  const video = document.getElementById("video");
-  const canvas = document.createElement("canvas");
-  const outputDiv = document.getElementById("output");
+    <script>
+      const inputImage = document.getElementById('input-image');
+      const output = document.getElementById('output');
 
-  let constraints = {
-    video: {
-      facingMode: "environment"
-    }
-  };
-
-  openCameraButton.addEventListener("click", function() {
-    navigator.mediaDevices
-      .getUserMedia(constraints)
-      .then(function(stream) {
-        video.srcObject = stream;
-        video.addEventListener("loadedmetadata", function() {
-          video.style.display = "block";
-          takePictureButton.style.display = "inline-block";
-        });
-      })
-      .catch(function(err) {
-        console.error(err);
+      inputImage.addEventListener('change', async () => {
+        const image = inputImage.files[0];
+        const result = await Tesseract.recognize(image);
+        output.innerText = result.text;
       });
-  });
-
-  takePictureButton.addEventListener("click", function() {
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    canvas.getContext("2d").drawImage(video, 0, 0);
-
-    Tesseract.recognize(canvas)
-      .then(function(result) {
-        let text = result.text;
-        outputDiv.innerHTML = text;
-      })
-      .catch(function(err) {
-        console.error(err);
-      });
-  });
-</script>
+    </script>
+  </body>
+</html>
